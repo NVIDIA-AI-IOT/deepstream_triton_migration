@@ -116,7 +116,6 @@ RUN apt-get update && \
 
 # @} Adding uff-converter-tf
 
-ADD deps/misc/libiothub_client.so /root/
 ADD deps/misc/docker_python_setup.sh /root/
 
 
