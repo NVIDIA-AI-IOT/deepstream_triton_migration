@@ -5,8 +5,8 @@ version from the version DeepStreamSDK was tested and released with.
 This information is useful for upgrading Triton on both x86 systems with dGPU setup
 and on NVIDIA Jetson devices.
 
-Example: User may follow the instructions here to upgrade deployment of DeepStreamSDK 6.0 which
-support Triton 21.08 to a more recent Triton version like 21.09.
+Example: User may follow the instructions here to upgrade deployment of DeepStreamSDK 6.0.1 which
+support Triton 21.08 (on dGPU) and 21.11 (on Jetson) to a more recent Triton version like 21.12.
 
 This repo have artefacts that can be used to generate NVIDIA DeepStream Triton Docker for x86 machines.
 For Jetson, please refer to [section 1.2 Jetson Binaries Update](#12-jetson-binaries-update).
@@ -64,7 +64,7 @@ Download file link:  [TensorRT-8.0.1.6.Linux.x86_64-gnu.cuda-11.3.cudnn8.2.tar.g
 Note: This step is optional and is required to use ``nvblender`` plugin.  
 This step is required until DeepStream officially support Ubuntu 20.04 (GStreamer version: 1.16).  
 Currently DeepStream support Ubuntu 18.04 (GStreamer version: 1.14).    
-a) Copy the file ``libgstbadvideo-1.0.so.0.1405.0`` from one of the DS 6.0 docker images into the host machine.
+a) Copy the file ``libgstbadvideo-1.0.so.0.1405.0`` from one of the DS 6.0.1 docker images into the host machine.
 The DS docker images are available at: https://ngc.nvidia.com/catalog/containers/nvidia:deepstream  
 b) Place the file ``libgstbadvideo-1.0.so.0.1405.0`` at ``x86_64/deps/misc/``  
 c) Uncomment the code marked with ``Extra Step (3)`` in ``x86_64/trtserver_base_devel/Dockerfile``  
@@ -72,9 +72,9 @@ c) Uncomment the code marked with ``Extra Step (3)`` in ``x86_64/trtserver_base_
 ### 1.1.3 Build Command
 
 ```
-sudo image_url=deepstream:6.0-triton-local \
-     ds_pkg=deepstream_sdk_v6.0.0_x86_64.tbz2 \
-     ds_pkg_dir=deepstream_sdk_v6.0.0_x86_64/ \
+sudo image_url=deepstream:6.0.1-triton-local \
+     ds_pkg=deepstream_sdk_v6.0.1_x86_64.tbz2 \
+     ds_pkg_dir=deepstream_sdk_v6.0.1_x86_64/ \
      base_image=dgpu-any-custom-base-image make triton-devel -C x86_64/
 ```
 
@@ -84,9 +84,29 @@ Triton Inference Server release packages could be found at https://github.com/tr
 
 To upgrade the triton version on Jetson DeepStream setup, we shall replace certain libraries as discussed in the Sections below.
 
+#### Create new Jetson triton container image with new Triton version
+
+
+1) Open the file ``jetson/deps/misc/triton_backend_setup.sh`` and replace the
+link to jetpack tarball for the variable ``TRITON_PKG_PATH``.  
+Procure the link to this file from Triton Release page at https://github.com/triton-inference-server/server/releases  
+Example, to upgrade to Triton 21.12, replace the variable value with:  
+ ``TRITON_PKG_PATH=https://github.com/triton-inference-server/server/releases/download/v2.17.0/tritonserver2.17.0-jetpack4.6.tgz``
+
+2) [Optional] Open file ``jetson/Dockerfile`` and use the ds6.0.1-samples container image as base
+instead of ds6.0.1-triton. ds6.0.1-triton has additional development libraries and headers
+to build DeepStream reference application and these may not be required for deployment.
+By default, the ds6.0.1-triton container image will be used as base to create the new image.
+
+3) Now run the following command:
+
+```
+sudo docker build jetson/ -t deepstream-l4t:6.0.1-triton-custom
+```
+
 #### Easy way to do Steps 1.2.1 and 1.2.2
 
-1) Please Install DeepStream 6.0 Package on the Jetson machine.
+1) Please Install DeepStream 6.0.1 Package on the Jetson machine.
 
 2) Open the file: ``/opt/nvidia/deepstream/deepstream/samples/triton_backend_setup.sh``
 
@@ -107,11 +127,11 @@ DS-Triton default backend location for Jetson: ``/opt/nvidia/deepstream/deepstre
 
 When users upgrade triton, they need to copy/replace their backends(TF/Custom) into the above folder.
 
-Take Triton 21.08 for example; backends could be found from https://github.com/triton-inference-server/server/releases/tag/v2.13.0.
+Take Triton 21.12 for example; backends could be found from https://github.com/triton-inference-server/server/releases/tag/v2.17.0.
 
-Jetson backends and libs are in [tritonserver2.13.0-jetpack4.6.tgz](https://github.com/triton-inference-server/server/releases/download/v2.13.0/tritonserver2.13.0-jetpack4.6.tgz).
+Jetson backends and libs are in [tritonserver2.17.0-jetpack4.6.tgz](https://github.com/triton-inference-server/server/releases/download/v2.17.0/tritonserver2.17.0-jetpack4.6.tgz).
 Currently, there are TF1/TF2 backends supported on Jetson.
-Users can try other triton versions and backends from release packages if the new interface is API & ABI compatible with Triton 21.08.
+Users can try other triton versions and backends from release packages if the new interface is API & ABI compatible with Triton 21.11.
 Tensorflow backends source code are available at https://github.com/triton-inference-server/tensorflow_backend/tree/r21.08
 
 
@@ -171,7 +191,7 @@ Instead of replacing the default backends location, another option is that, upda
 Users need to replace ``/opt/nvidia/deepstream/deepstream/lib/libtritonserver.so`` with a specific triton build version.
 From [Triton release webpage](https://github.com/triton-inference-server/server/releases), users could find "Jetson Jetpack Support" section to download specific tritonserver libs.
 
-For example, TritonServer 21.09 lib is in [tritonserver2.13.0-jetpack4.6.tgz](https://github.com/triton-inference-server/server/releases/download/v2.13.0/tritonserver2.13.0-jetpack4.6.tgz).
+For example, TritonServer 21.12 lib is in [tritonserver2.17.0-jetpack4.6.tgz](https://github.com/triton-inference-server/server/releases/download/v2.17.0/tritonserver2.17.0-jetpack4.6.tgz).
 And source code is from https://github.com/triton-inference-server/server/tree/r21.08.
 
 ### 1.3 Triton Backend upgrade
@@ -200,14 +220,20 @@ Users can also update gst-nvinferserver’s config file to the new backends fold
 
 ### 2.1 Tritonserver lib upgrade
 
-DeepStream 6.0 GA Triton Server API is based on Triton 21.08 (Jetson) and 21.08 (x86) release.
+DeepStream 6.0.1 GA Triton Server API is based on Triton 21.11 (Jetson) and 21.08 (x86) release.
 
 Regarding API compatibility, if a customer wants to upgrade triton, they need to make sure:
 
-a) new version's `tritonserver.h` is compatible with  the [21.08 version of tritonserver.h](https://github.com/triton-inference-server/core/blob/r21.08/include/triton/core/tritonserver.h)
+a) new version's `tritonserver.h` is compatible with  the:
+
+[21.08 version of tritonserver.h for x86](https://github.com/triton-inference-server/core/blob/r21.08/include/triton/core/tritonserver.h), 
+[21.11 version of tritonserver.h for jetson](https://github.com/triton-inference-server/core/blob/r21.11/include/triton/core/tritonserver.h)
 and 
 
-b) new version’s `model_config.proto` is exactly same as [21.08 version](https://github.com/triton-inference-server/server/blob/r21.08/src/core/model_config.proto).
+b) new version’s `model_config.proto` is exactly same as:
+
+[21.08 version for x86](https://github.com/triton-inference-server/server/blob/r21.08/src/core/model_config.proto), 
+[21.11 version for jetson](https://github.com/triton-inference-server/server/blob/r21.11/src/core/model_config.proto).
 
 To build specific Tritonserver version libs, users can follow instructions at https://github.com/triton-inference-server/server/blob/master/docs/build.md.
 
@@ -215,15 +241,16 @@ To build specific Tritonserver version libs, users can follow instructions at ht
 ### 2.2 DeepStream Config file Requirement
 
 Gst-nvinferserver plugin’s config file kept backward compatibility.
-Triton model/backend’s config.pbtxt file must follow rules of 21.08’s ``model_config.proto``.
+Triton model/backend’s config.pbtxt file must follow rules of 21.08’s ``model_config.proto`` for x86 and 
+21.11's ``model_config.proto`` for jetson.
 
 ## 3 Ubuntu Version Requirements
 
 ### 3.1 Ubuntu 20.04 (Triton 21.02+)
 
-DeepStream 6.0 Triton docker release is based on Triton 21.08
+DeepStream 6.0.1 Triton docker release is based on Triton 21.08 (x86) and 21.11 (Jetson)
 which is built on top of Ubuntu 20.04.
-DeepStream 6.0 release package inherently supports Ubuntu 18.04, and thus, we
+DeepStream 6.0.1 release package inherently supports Ubuntu 18.04, and thus, we
 need to follow these additional steps mentioned below.
 
 a) DeepStream Python bindings are supported on python 3.6. That version of python should be setup on the machine / docker.
@@ -240,21 +267,16 @@ Below steps need to be followed to run DeepStream python apps in the x86 Triton 
 
 - Note: if at some point the user runs `apt --fix-all-broken`, then they'll need to run `docker_python_setup.sh` script again.
 
-b) Azure iot sdk binary (``libiothub_client.so``) available with DeepStream 6.0 package(x86) has been compiled against libcurl3.
-
-It should be recompiled against default libcurl (libcurl4) library available on the system.
-This is done for the user and kept at ``x86_64/deps/misc/libiothub_client.so``
-
-c) Symbolic link for python to python3 for successful compilation of librdkafka.
+b) Symbolic link for python to python3 for successful compilation of librdkafka.
 
 This is done for the user at ``x86_64/trtserver_base_devel/Dockerfile``.
 
-d) Symbolic link for opencv.pc to opencv4.pc for successful compilation of DS apps.
+c) Symbolic link for opencv.pc to opencv4.pc for successful compilation of DS apps.
 
 This is done for the user at ``x86_64/trtserver_base_devel/Dockerfile``.
 
 ### 3.2 Ubuntu 18.04
 
-DeepStream 6.0 release package inherently support Ubuntu 18.04.
+DeepStream 6.0.1 release package inherently support Ubuntu 18.04.
 
-Thus, the only thing to consider is API/ABI compatibility between the new Triton version and Triton 21.08.
+Thus, the only thing to consider is API/ABI compatibility between the new Triton version and the Triton version supported by current DS release.
