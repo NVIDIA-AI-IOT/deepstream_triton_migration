@@ -26,9 +26,7 @@
 # to use samples as base docker for a lighter container image.
 # FROM nvcr.io/nvidia/deepstream-l4t:6.0-samples
 
-#FROM nvcr.io/nvidia/deepstream-l4t:6.0.1-triton
-#Below line of code is for SQA verification before we have dockers up on NGC
-FROM gitlab-master.nvidia.com:5005/deepstreamsdk/release_image/deepstream-l4t:6.0.1-samples-prc4
+FROM nvcr.io/nvidia/deepstream-l4t:6.0.1-triton
 
 # ADD the triton backend installation script and execute the same
 # Note: Users need to update the URL to procure newer Triton release
