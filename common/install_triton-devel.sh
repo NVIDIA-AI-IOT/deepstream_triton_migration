@@ -29,7 +29,7 @@ utils_install_librdkafka_from_source()
     cd "/root/tmp"
     git clone https://github.com/edenhill/librdkafka.git
     cd librdkafka
-    git reset --hard 7101c2310341ab3f4675fc565f64f0967e135a6a
+    git reset --hard 063a9ae7a65cebdf1cc128da9815c05f91a2a996
     ./configure --enable-ssl
     make -j$(nproc)
     make install

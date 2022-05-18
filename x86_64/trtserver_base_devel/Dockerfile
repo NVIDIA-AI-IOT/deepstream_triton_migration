@@ -20,14 +20,37 @@
  # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  # DEALINGS IN THE SOFTWARE.
 
-FROM nvcr.io/nvidia/tritonserver:21.08-py3
-
-ADD nvidia-ml.list /etc/apt/sources.list.d/
+FROM nvcr.io/nvidia/tritonserver:22.03-py3
 
 ARG TENSORRT_VERSION
-ARG CUDNN_VERSION
+ARG CUDNN_VERSION_2
 ARG DS_DIR
 ARG BOOST_VERSION=1.71.0
+
+# Fixing: CUDA Linux Repository Key Rotation
+# https://forums.developer.nvidia.com/t/notice-cuda-linux-repository-key-rotation/212772
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb -O /root/cuda-keyring_1.0-1_all.deb
+RUN apt-key del 7fa2af80 && \
+        dpkg -i /root/cuda-keyring_1.0-1_all.deb && \
+        rm /root/cuda-keyring_1.0-1_all.deb
+
+#Removing unnecessary nvidia entries in sources.list
+RUN head -n -2 /etc/apt/sources.list > /tmp/tmp.txt && mv /tmp/tmp.txt /etc/apt/sources.list
+
+RUN apt-get update && \
+        DEBIAN_FRONTEND=noninteractive  apt-get install -y --no-install-recommends \
+        libcudnn8=${CUDNN_VERSION_2} \
+        libcudnn8-dev=${CUDNN_VERSION_2} \
+        libnvinfer8=${TENSORRT_VERSION} \
+        libnvinfer-dev=${TENSORRT_VERSION} \
+        libnvparsers8=${TENSORRT_VERSION} \
+        libnvparsers-dev=${TENSORRT_VERSION} \
+        libnvonnxparsers8=${TENSORRT_VERSION} \
+        libnvonnxparsers-dev=${TENSORRT_VERSION} \
+        libnvinfer-plugin8=${TENSORRT_VERSION} \
+        libnvinfer-plugin-dev=${TENSORRT_VERSION} \
+        python3-libnvinfer=${TENSORRT_VERSION} \
+        python3-libnvinfer-dev=${TENSORRT_VERSION}
 
 RUN apt-get update && \
 	DEBIAN_FRONTEND=noninteractive 	apt-get install -y --no-install-recommends \
@@ -88,12 +111,18 @@ RUN apt-get update && \
 	rsyslog \
 	vim  \
 	python-is-python3 \
-#	python-libnvinfer=${TENSORRT_VERSION} \
-#	python3-libnvinfer=${TENSORRT_VERSION} \
-#	python-libnvinfer-dev=${TENSORRT_VERSION} \
-#	python3-libnvinfer-dev=${TENSORRT_VERSION} \
 	&& rm -rf /var/lib/apt/lists/* \
   ; apt autoremove
+
+# install realsense sdk for 3d camera (Optional; disabled by default)
+# instructions: https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md
+#RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE && \
+#        apt-get update && DEBIAN_FRONTEND=noninteractive  apt-get install -y software-properties-common && \
+#        add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u &&  apt-get update && \
+#        DEBIAN_FRONTEND=noninteractive         apt-get install -y \
+#        librealsense2-dev librealsense2-utils && \
+#        rm -rf /var/lib/apt/lists/* && \
+#        apt autoremove
 
 # @{ Extra Step (1) Adding uff-converter-tf and graphsurgeon-tf packages
 
@@ -106,18 +135,15 @@ RUN echo "Please follow README for Required Extra Step (1) if the following inst
 #Uncomment the following lines of code for ADD and RUN
 #to install the uff-converter-tf package
 
-ADD uff-converter-tf_${TENSORRT_VERSION}_amd64.deb graphsurgeon-tf_${TENSORRT_VERSION}_amd64.deb /root/
-RUN apt-get update && \
-	DEBIAN_FRONTEND=noninteractive  apt-get install -y --no-install-recommends \
-	/root/uff-converter-tf_${TENSORRT_VERSION}_amd64.deb \
-	/root/graphsurgeon-tf_${TENSORRT_VERSION}_amd64.deb && \
-	rm /root/uff-converter-tf_${TENSORRT_VERSION}_amd64.deb  \
-	/root/graphsurgeon-tf_${TENSORRT_VERSION}_amd64.deb
+#ADD uff-converter-tf_${TENSORRT_VERSION}_amd64.deb graphsurgeon-tf_${TENSORRT_VERSION}_amd64.deb /root/
+#RUN apt-get update && \
+#	DEBIAN_FRONTEND=noninteractive  apt-get install -y --no-install-recommends \
+#	/root/uff-converter-tf_${TENSORRT_VERSION}_amd64.deb \
+#	/root/graphsurgeon-tf_${TENSORRT_VERSION}_amd64.deb && \
+#	rm /root/uff-converter-tf_${TENSORRT_VERSION}_amd64.deb  \
+#	/root/graphsurgeon-tf_${TENSORRT_VERSION}_amd64.deb
 
 # @} Adding uff-converter-tf
-
-ADD deps/misc/docker_python_setup.sh /root/
-
 
 # @{ Extra Step (2): Installing TRT Python3 API
 
@@ -128,9 +154,9 @@ RUN echo "Please follow README for Required Extra Step (2) if the following inst
 
 #Uncomment the following lines of code for ADD and RUN
 
-ADD deps/misc/TensorRT-8.0.1.6.Linux.x86_64-gnu.cuda-11.3.cudnn8.2.tar.gz /root/
-RUN pip3 install /root/TensorRT-8.0.1.6/python/tensorrt-8.0.1.6-cp38-none-linux_x86_64.whl
-RUN rm -rf /root/TensorRT-8.0.1*
+#ADD deps/misc/TensorRT-8.0.1.6.Linux.x86_64-gnu.cuda-11.3.cudnn8.2.tar.gz /root/
+#RUN pip3 install /root/TensorRT-8.0.1.6/python/tensorrt-8.0.1.6-cp38-none-linux_x86_64.whl
+#RUN rm -rf /root/TensorRT-8.0.1*
 
 # @} Installing TRT Python API
 
@@ -156,15 +182,3 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libnvcuvid.so.1 /usr/lib/x86_64-linux-gnu/li
 
 ADD deps/gRPC_installation.sh /root/
 RUN /root/gRPC_installation.sh
-
-
-# @{ Extra Step (3); To copy over GStreamer 1.14 library for the DS plugin nvblender.
-# This step is required until DeepStream officially support Ubuntu 20.04 (GStreamer version: 1.16).
-# Currently DeepStream support Ubuntu 18.04 (GStreamer version: 1.14)
-
-# Note: Uncomment the ADD and RUN commands below when required for nvblender.
-
-# Copying the library from GStreamer 1.14 package into the container
-# ADD deps/misc/libgstbadvideo-1.0.so.0.1405.0 /usr/lib/x86_64-linux-gnu/libgstbadvideo-1.0.so.0.1405.0
-# ENV LD_PRELOAD /usr/lib/x86_64-linux-gnu/libgstbadvideo-1.0.so.0
-# @}  To copy over GStreamer 1.14 library for the DS plugin nvblender
