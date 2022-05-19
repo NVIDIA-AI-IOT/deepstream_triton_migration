@@ -22,10 +22,10 @@
 img_type = triton-devel
 prefix = deepstream_x86
 platform = x86_64
-ds_dir = /opt/nvidia/deepstream/deepstream-6.0
-platform_build_arg = --build-arg TENSORRT_VERSION="8.0.1-1+cuda11.3"
-platform_build_arg += --build-arg CUDNN_VERSION="8.0.4.30-1+cuda11.1"
-platform_build_arg += --build-arg CUDA_VERSION="11.1"
+ds_dir = /opt/nvidia/deepstream/deepstream-6.1
+platform_build_arg = --build-arg TENSORRT_VERSION="8.2.5-1+cuda11.4"
+platform_build_arg += --build-arg CUDNN_VERSION_2="8.4.0.27-1+cuda11.6"
+platform_build_arg += --build-arg CUDA_VERSION="11.6.1"
 platform_build_arg += --build-arg DS_DIR=$(ds_dir)
 
 DOCKER=docker
