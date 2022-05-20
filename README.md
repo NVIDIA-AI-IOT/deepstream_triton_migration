@@ -29,9 +29,9 @@ The current version is 22.03 and the base docker used in the above Dockerfile is
 Note: For customers to be able to upgrade to any of the new Triton versions,
 they need to confirm API & ABI compatibility with the respective Triton version.
 
-### 1.1.1 Prerequisites; (DeepStreamSDK package and terminology)
+### 1.1.1 Prerequisites; Mandatory; (DeepStreamSDK package and terminology)
 
-1) Please download the [DeepStreamSDK release](https://developer.nvidia.com/deepstream-getting-started) tarball and place it locally
+1) Please download the [DeepStreamSDK release](https://developer.nvidia.com/deepstream-getting-started) x86 tarball and place it locally
 in the ``$ROOT/x86_64`` folder of this repository.
 
 2) `image_url` is the desired docker name:TAG
@@ -43,23 +43,24 @@ tarball extension respectively. Refer to [Section 1.1.3 Build Command](#113-buil
 provided in the command above. This name is used in the triton build steps alone.
 Refer to [Section 1.1.3 Build Command](#113-build-command) for sample command.
 
-### 1.1.2 Prerequisites; (TensorRT and other third-party packages)
+### 1.1.2 Prerequisites; Optional; (TensorRT and other third-party packages)
 
-1) Adding uff-converter-tf and graphsurgeon-tf packages.  
-Download file link: [nv-tensorrt-repo-ubuntu1804-cuda11.3-trt8.0.1.6-ga-20210626_1-1_amd64.deb](https://developer.nvidia.com/compute/machine-learning/tensorrt/secure/8.0.1/local_repos/nv-tensorrt-repo-ubuntu1804-cuda11.3-trt8.0.1.6-ga-20210626_1-1_amd64.deb) from TensorRT download page.  
+1) Adding uff-converter-tf and graphsurgeon-tf packages.
+
+Note: This is an optional step to install uff-converter-tf and graphsurgeon-tf packages.
+
+Download file link: [nv-tensorrt-repo-ubuntu2004-cuda11.4-trt8.2.5.1-ga-20220505_1-1_amd64.deb](https://developer.nvidia.com/compute/machine-learning/tensorrt/secure/8.2.5.1/local_repos/nv-tensorrt-repo-ubuntu2004-cuda11.4-trt8.2.5.1-ga-20220505_1-1_amd64.deb) from TensorRT download page.  
 Note: You may have to login to [developer.nvidia.com](https://developer.nvidia.com/) to download the file.  
 Quick Steps:  
 $ROOT is the root directory of this git repo.    
 ``cd $ROOT``  
 ``mkdir tmp``  
-``dpkg-deb -R nv-tensorrt-repo-ubuntu1804-cuda11.3-trt8.0.1.6-ga-20210626_1-1_amd64.deb tmp``  
-``cp tmp/var/nv-tensorrt-repo-ubuntu1804-cuda11.3-trt8.0.1.6-ga-20210626/uff-converter-tf_8.0.1-1+cuda11.3_amd64.deb x86_64/``  
-``cp tmp/var/nv-tensorrt-repo-ubuntu1804-cuda11.3-trt8.0.1.6-ga-20210626/graphsurgeon-tf_8.0.1-1+cuda11.3_amd64.deb x86_64/``  
+``dpkg-deb -R nv-tensorrt-repo-ubuntu2004-cuda11.4-trt8.2.5.1-ga-20220505_1-1_amd64.deb tmp``  
+``cp tmp/var/nv-tensorrt-repo-ubuntu2004-cuda11.4-trt8.2.5.1-ga-20220505/uff-converter-tf_8.2.5-1+cuda11.4_amd64.deb x86_64/``  
+``cp tmp/var/nv-tensorrt-repo-ubuntu2004-cuda11.4-trt8.2.5.1-ga-20220505/graphsurgeon-tf_8.2.5-1+cuda11.4_amd64.deb x86_64/``  
 
-2) Installing TRT Python3 API.  
-Download into ``x86_64/deps/misc`` folder the TensorRT- tarball installation file - "TensorRT 8.0.1 GA for Linux x86_64 and CUDA 11.3 TAR package" from:
-https://developer.nvidia.com/nvidia-tensorrt-download  
-Download file link:  [TensorRT-8.0.1.6.Linux.x86_64-gnu.cuda-11.3.cudnn8.2.tar.gz](https://developer.nvidia.com/compute/machine-learning/tensorrt/secure/8.0.1/tars/tensorrt-8.0.1.6.linux.x86_64-gnu.cuda-11.3.cudnn8.2.tar.gz)  
+Note: Please uncomment corresponding installation commands in ``x86_64/trtserver_base_devel/Dockerfile`` to install these optional packages inside the container.
+
 ### 1.1.3 Build Command
 
 ```
