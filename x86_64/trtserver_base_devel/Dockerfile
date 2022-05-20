@@ -143,24 +143,7 @@ RUN echo "Please follow README for Required Extra Step (1) if the following inst
 #	rm /root/uff-converter-tf_${TENSORRT_VERSION}_amd64.deb  \
 #	/root/graphsurgeon-tf_${TENSORRT_VERSION}_amd64.deb
 
-# @} Adding uff-converter-tf
-
-# @{ Extra Step (2): Installing TRT Python3 API
-
-#Note: Download into x86_64/deps/misc folder the TensorRT- tarball installation file from:
-# https://developer.nvidia.com/nvidia-tensorrt-download
-
-RUN echo "Please follow README for Required Extra Step (2) if the following installation fail for missing files"
-
-#Uncomment the following lines of code for ADD and RUN
-
-#ADD deps/misc/TensorRT-8.0.1.6.Linux.x86_64-gnu.cuda-11.3.cudnn8.2.tar.gz /root/
-#RUN pip3 install /root/TensorRT-8.0.1.6/python/tensorrt-8.0.1.6-cp38-none-linux_x86_64.whl
-#RUN rm -rf /root/TensorRT-8.0.1*
-
-# @} Installing TRT Python API
-
-
+# @} Adding uff-converter-tf and graphsurgeon-tf packages
 
 COPY trtserver_base_runtime/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
 COPY trtserver_base_runtime/entrypoint.sh ${DS_DIR}/
