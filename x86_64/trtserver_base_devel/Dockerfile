@@ -1,26 +1,25 @@
- # The MIT License (MIT)
- # 
- # Copyright (c) 2021, NVIDIA CORPORATION. All rights reserved.
- #
- # Permission is hereby granted, free of charge, to any person obtaining a
- # copy of this software and associated documentation files (the "Software"),
- # to deal in the Software without restriction, including without limitation
- # the rights to use, copy, modify, merge, publish, distribute, sublicense,
- # and/or sell copies of the Software, and to permit persons to whom the
- # Software is furnished to do so, subject to the following conditions:
- #
- # The above copyright notice and this permission notice shall be included in
- # all copies or substantial portions of the Software.
- #
- # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- # DEALINGS IN THE SOFTWARE.
+# SPDX-FileCopyrightText: Copyright (c) 2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
 
-FROM nvcr.io/nvidia/tritonserver:22.03-py3
+FROM nvcr.io/nvidia/tritonserver:22.07-py3
 
 ARG TENSORRT_VERSION
 ARG CUDNN_VERSION_2
@@ -37,20 +36,22 @@ RUN apt-key del 7fa2af80 && \
 #Removing unnecessary nvidia entries in sources.list
 RUN head -n -2 /etc/apt/sources.list > /tmp/tmp.txt && mv /tmp/tmp.txt /etc/apt/sources.list
 
-RUN apt-get update && \
-        DEBIAN_FRONTEND=noninteractive  apt-get install -y --no-install-recommends \
-        libcudnn8=${CUDNN_VERSION_2} \
-        libcudnn8-dev=${CUDNN_VERSION_2} \
-        libnvinfer8=${TENSORRT_VERSION} \
-        libnvinfer-dev=${TENSORRT_VERSION} \
-        libnvparsers8=${TENSORRT_VERSION} \
-        libnvparsers-dev=${TENSORRT_VERSION} \
-        libnvonnxparsers8=${TENSORRT_VERSION} \
-        libnvonnxparsers-dev=${TENSORRT_VERSION} \
-        libnvinfer-plugin8=${TENSORRT_VERSION} \
-        libnvinfer-plugin-dev=${TENSORRT_VERSION} \
-        python3-libnvinfer=${TENSORRT_VERSION} \
-        python3-libnvinfer-dev=${TENSORRT_VERSION}
+#Installing specific TRT, CuDNN versions over the versions provided by the Triton base docker image
+#Users may uncomment below if needed and declare the compute lib versions at x86_64/Makefile
+#RUN apt-get update && \
+#        DEBIAN_FRONTEND=noninteractive  apt-get install -y --no-install-recommends \
+#        libcudnn8=${CUDNN_VERSION_2} \
+#        libcudnn8-dev=${CUDNN_VERSION_2} \
+#        libnvinfer8=${TENSORRT_VERSION} \
+#        libnvinfer-dev=${TENSORRT_VERSION} \
+#        libnvparsers8=${TENSORRT_VERSION} \
+#        libnvparsers-dev=${TENSORRT_VERSION} \
+#        libnvonnxparsers8=${TENSORRT_VERSION} \
+#        libnvonnxparsers-dev=${TENSORRT_VERSION} \
+#        libnvinfer-plugin8=${TENSORRT_VERSION} \
+#        libnvinfer-plugin-dev=${TENSORRT_VERSION} \
+#        python3-libnvinfer=${TENSORRT_VERSION} \
+#        python3-libnvinfer-dev=${TENSORRT_VERSION}
 
 RUN apt-get update && \
 	DEBIAN_FRONTEND=noninteractive 	apt-get install -y --no-install-recommends \
@@ -95,6 +96,7 @@ RUN apt-get update && \
 	libssl-dev \
 	libopencv-dev \
 	freeglut3-dev \
+	libyaml-cpp-dev \
 	libjpeg-dev \
 	libcurl4-gnutls-dev \
 	libjson-glib-dev \
@@ -145,8 +147,8 @@ RUN echo "Please follow README for Required Extra Step (1) if the following inst
 
 # @} Adding uff-converter-tf and graphsurgeon-tf packages
 
-COPY trtserver_base_runtime/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
-COPY trtserver_base_runtime/entrypoint.sh ${DS_DIR}/
+COPY trtserver_base_devel/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+COPY trtserver_base_devel/entrypoint.sh ${DS_DIR}/
 
 
 
