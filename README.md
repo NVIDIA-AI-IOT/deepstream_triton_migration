@@ -11,6 +11,15 @@ support Triton 22.07 (on dGPU and Jetson) to a more recent Triton version like 2
 This repo have artefacts that can be used to generate NVIDIA DeepStream Triton Docker for x86 machines.
 For Jetson, please refer to [section 1.2 Jetson Binaries Update](#12-jetson-binaries-update).
 
+### Additional Installations to use all DeepStreamSDK Features.
+
+With DS 6.1.1, DeepStream docker containers do not package libraries necessary for certain multimedia operations like audio data parsing, CPU decode, and CPU encode.
+This change could affect processing certain video streams/files like mp4 that include audio tracks.
+
+Please run the below script inside the docker images to install additional packages that might be necessary to use all of the DeepStreamSDK features :
+
+``/opt/nvidia/deepstream/deepstream/user_additional_install.sh``
+
 ## 1 How to update the Triton version?
 
 ## 1.1 DeepStream x86 docker image update

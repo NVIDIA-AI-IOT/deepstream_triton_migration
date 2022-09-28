@@ -1,7 +1,4 @@
 #!/bin/bash
-#
-# The MIT License (MIT)
-# 
 # SPDX-FileCopyrightText: Copyright (c) 2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
@@ -22,7 +19,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
-
 
 utils_install_librdkafka_from_source()
 {
@@ -59,6 +55,13 @@ utils_install_libhiredis_from_source()
 
 }
 
+#Throws an error and causes a build failure for all errors in the script
+#Custom Message describes where the error was thrown
+#Bug 200714632
+set -o errtrace
+trap "echo CUSTOM MESSAGE: ERROR occured in this file: $BASH_SOURCE}" ERR
+set -o errexit
+
 cd "/root/tmp"
 
 utils_install_librdkafka_from_source
@@ -70,3 +73,4 @@ utils_install_libhiredis_from_source
 
 cp /root/tmp/LicenseAgreementContainer.pdf /opt/nvidia/deepstream/deepstream/
 
+mv /opt/user_additional_install_devel.sh /opt/nvidia/deepstream/deepstream/user_additional_install.sh
