@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2022-23 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -24,9 +24,9 @@
 # Uncomment line #28 and comment out the line #30
 # to use samples as base docker for a lighter container image.
 
-# FROM nvcr.io/nvidia/deepstream-l4t:6.1.1-samples
+# FROM nvcr.io/nvidia/deepstream-l4t:6.2-samples
 
-FROM nvcr.io/nvidia/deepstream-l4t:6.1.1-triton
+FROM nvcr.io/nvidia/deepstream-l4t:6.2-triton
 
 # ADD the triton backend installation script and execute the same
 # Note: Users need to update the URL to procure newer Triton release
