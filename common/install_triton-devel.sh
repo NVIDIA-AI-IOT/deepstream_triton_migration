@@ -1,5 +1,5 @@
 #!/bin/bash
-# SPDX-FileCopyrightText: Copyright (c) 2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2022-23 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -74,3 +74,4 @@ utils_install_libhiredis_from_source
 cp /root/tmp/LicenseAgreementContainer.pdf /opt/nvidia/deepstream/deepstream/
 
 mv /opt/user_additional_install_devel.sh /opt/nvidia/deepstream/deepstream/user_additional_install.sh
+mv /opt/user_deepstream_python_apps_install.sh /opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh
